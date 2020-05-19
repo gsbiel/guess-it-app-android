@@ -18,13 +18,18 @@ class GameViewModel: ViewModel() {
             get() = _score
 
     // The list of words - the front of the list is the next word to guess
-    lateinit var wordList: MutableList<String>
+    private lateinit var wordList: MutableList<String>
+
+    private val _eventGameFinish = MutableLiveData<Boolean>()
+    val eventGameFinish: LiveData<Boolean>
+        get() = _eventGameFinish
 
     init{
         Log.i("GameViewModel", "GameViewModel created!")
         resetList()
         nextWord()
         _score.postValue(0)
+        _eventGameFinish.postValue(false)
     }
 
     override fun onCleared() {
@@ -68,7 +73,7 @@ class GameViewModel: ViewModel() {
     private fun nextWord() {
         //Select and remove a word from the list
         if (wordList.isEmpty()) {
-//            gameFinished()
+            _eventGameFinish.postValue(true)
         } else {
             _word.postValue(wordList.removeAt(0))
         }
@@ -84,5 +89,9 @@ class GameViewModel: ViewModel() {
     fun onCorrect() {
         _score.postValue((score.value)?.plus(1))
         nextWord()
+    }
+
+    fun onGameFinishComplete() {
+        _eventGameFinish.postValue(false)
     }
 }
